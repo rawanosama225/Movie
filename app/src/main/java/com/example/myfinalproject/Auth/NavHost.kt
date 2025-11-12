@@ -32,6 +32,7 @@ import com.example.myfinalproject.MovieDetails.MovieDetailsScreen
 import com.example.myfinalproject.MovieDetails.MovieDetailsViewModel
 import com.example.myfinalproject.MovieDetails.MovieDetailsViewModelFactory
 import com.example.myfinalproject.Model.Network.ApiService
+import com.example.myfinalproject.ProfileScreen
 import com.example.myfinalproject.SearchScreen.searchUi.SearchScreen
 import com.example.myfinalproject.SearchScreen.SearchViewModel
 import com.example.myfinalproject.SearchScreen.SearchViewModelFactory
@@ -210,6 +211,40 @@ fun AppNavHost(navController: NavHostController) {
                         }
                     },
                     currentRoute = currentRoute ?: "search"
+                )
+            }
+
+            // profile
+            composable("profile") {
+                val username = FirebaseAuth.getInstance().currentUser?.displayName ?: "Guest"
+
+                ProfileScreen(
+                    username = username,
+                    onSignOut = {
+                        authVM.signOut()
+                        navController.navigate("auth") {
+                            popUpTo("profile") { inclusive = true }
+                        }
+                    },
+                    onFavoritesClick = {
+                        navController.navigate("favorites") {
+                            popUpTo("profile")
+                            launchSingleTop = true
+                        }
+                    },
+                    onSearchClick = {
+                        navController.navigate("search") {
+                            popUpTo("profile")
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            popUpTo("profile")
+                            launchSingleTop = true
+                        }
+                    },
+                    currentRoute = currentRoute ?: "profile"
                 )
             }
         }
