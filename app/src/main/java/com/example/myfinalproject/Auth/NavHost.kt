@@ -36,6 +36,7 @@ import com.example.myfinalproject.ProfileScreen
 import com.example.myfinalproject.SearchScreen.searchUi.SearchScreen
 import com.example.myfinalproject.SearchScreen.SearchViewModel
 import com.example.myfinalproject.SearchScreen.SearchViewModelFactory
+import com.example.myfinalproject.SplashScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -45,7 +46,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun AppNavHost(navController: NavHostController) {
     var authMode by rememberSaveable { mutableStateOf(AuthMode.SIGNIN) }
-    val startDestination = if (FirebaseAuth.getInstance().currentUser != null) "home" else "auth"
+    val startDestination = "splash"
+        //if (FirebaseAuth.getInstance().currentUser != null) "home" else "auth"
     val authVM: AuthViewModel = viewModel()
 
     // Create context and database
@@ -82,6 +84,8 @@ fun AppNavHost(navController: NavHostController) {
             navController = navController,
             startDestination = startDestination
         ) {
+            //splash
+            composable("splash") { SplashScreen(navController) }
             //  Auth
             composable("auth") {
                 AuthScreenNew(
