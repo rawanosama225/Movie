@@ -5,16 +5,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myfinalproject.Model.Repo.MovieRepository
 import com.example.myfinalproject.Model.Data.Movie
+import com.example.myfinalproject.Model.Repo.UserRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class FavoritesViewModel(private val repository: MovieRepository) : ViewModel()
+class FavoritesViewModel(
+    private val repository: MovieRepository,
+    private val userRepo: UserRepo
+) : ViewModel()
 
 {
 
     private val _favoriteMovies = MutableStateFlow<List<Movie>>(emptyList())
     val favoriteMovies = _favoriteMovies.asStateFlow()
+
+    private val _userId = MutableStateFlow("")
+    val userId = _userId.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -22,6 +30,7 @@ class FavoritesViewModel(private val repository: MovieRepository) : ViewModel()
     init {
         //  loadFavorites
         observeFavorites()
+        getUserId()
     }
 
 
@@ -37,7 +46,7 @@ class FavoritesViewModel(private val repository: MovieRepository) : ViewModel()
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _favoriteMovies.value = repository.getFavoriteMovies()
+                _favoriteMovies.value = repository.getFavoriteMovies(userId.value)
             } catch (e: Exception) {
                 e.printStackTrace()
                 _favoriteMovies.value = emptyList()
@@ -53,15 +62,22 @@ class FavoritesViewModel(private val repository: MovieRepository) : ViewModel()
            // loadFavorites() // Reload the list
         }
     }
+
+    fun getUserId(){
+        viewModelScope.launch {
+           _userId.value = userRepo.getUserId()
+        }
+    }
 }
 
 class FavoritesViewModelFactory(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    private val userRepo: UserRepo
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return FavoritesViewModel(repository) as T
+            return FavoritesViewModel(repository,userRepo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 class FavoritesRepository(private val dao: FavoriteMovieDao)
  {
 
-    suspend fun getAllFavorites(): List<FavoriteMovie> {
-        return dao.getAllFavorites()
+    suspend fun getAllFavorites(userId:String): List<FavoriteMovie> {
+        return dao.getAllFavorites(userId = userId)
     }
 
 

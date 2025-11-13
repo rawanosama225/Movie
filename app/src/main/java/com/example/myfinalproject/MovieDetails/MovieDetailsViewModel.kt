@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.myfinalproject.Model.Data.Movie
 import com.example.myfinalproject.Model.Repo.MovieRepository
 import com.example.myfinalproject.Model.Data.MovieDetails
+import com.example.myfinalproject.Model.Repo.UserRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 class MovieDetailsViewModel(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    private val userRepo: UserRepo
 ) : ViewModel() {
 
     private val _movieState = MutableStateFlow<MovieDetails?>(null)
@@ -52,6 +54,7 @@ class MovieDetailsViewModel(
     fun toggleFavorite() {
         viewModelScope.launch {
             val movieDetails = _movieState.value ?: return@launch
+            val userId = userRepo.getUserId()
 
             if (isFavorite.value) {
                 repository.removeFromFavorites(movieDetails.id)
@@ -59,6 +62,7 @@ class MovieDetailsViewModel(
             } else {
                 val movie = Movie(
                     id = movieDetails.id,
+                    userId = userId,
                     title = movieDetails.title,
                     overview = movieDetails.overview,
                     poster_path = movieDetails.poster_path,
@@ -74,12 +78,13 @@ class MovieDetailsViewModel(
 }
 
 class MovieDetailsViewModelFactory(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    private val userRepo: UserRepo
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MovieDetailsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MovieDetailsViewModel(repository) as T
+            return MovieDetailsViewModel(repository, userRepo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

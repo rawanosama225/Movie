@@ -1,6 +1,7 @@
 package com.example.myfinalproject.FavScreen
 
 import android.graphics.fonts.FontFamily
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,10 +35,14 @@ fun FavoritesScreen(
     onNavigate: (String) -> Unit = {},
     currentRoute: String = "favorites"
 ) {
+
+    val TAG = "FavoritesScreen"
     val favoriteMovies by viewModel.favoriteMovies.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val userId by viewModel.userId.collectAsState()
 
     LaunchedEffect(Unit) {
+        Log.d(TAG, "FavoritesScreen: $userId")
         viewModel.loadFavorites()
     }
 
@@ -73,9 +78,11 @@ fun FavoritesScreen(
                     CircularProgressIndicator(color = Color.Red)
                 }
             }
+
             favoriteMovies.isEmpty() -> {
                 EmptyFavoritesContent()
             }
+
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
@@ -87,7 +94,7 @@ fun FavoritesScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(favoriteMovies,{ "favorite_${it.id}" }) { movie ->
+                    items(favoriteMovies, { "favorite_${it.id}" }) { movie ->
                         FavoriteMovieItem(
                             movie = movie,
                             onClick = { onMovieClick(movie.id) },
@@ -99,6 +106,7 @@ fun FavoritesScreen(
         }
     }
 }
+
 @Composable
 fun EmptyFavoritesContent() {
     EmptyStateScreen(

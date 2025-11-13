@@ -7,17 +7,19 @@ import androidx.room.PrimaryKey
 data class FavoriteMovie(
     @PrimaryKey
     val id: Int,
+    val userId: String,
     val title: String,
     val overview: String,
     val posterPath: String,
     val backdropPath: String,
     val releaseDate: String,
-    val voteAverage: Double
+    val voteAverage: Double,
 )
 
 fun Movie.toFavoriteMovie(): FavoriteMovie {
     return FavoriteMovie(
         id = this.id,
+        userId = this.userId ?: "",
         title = this.title ?: "",
         overview = this.overview ?: "",
         posterPath = this.poster_path ?: "",
@@ -30,6 +32,7 @@ fun Movie.toFavoriteMovie(): FavoriteMovie {
 fun FavoriteMovie.toMovie(): Movie {
     return Movie(
         id = this.id,
+        userId = this.userId,
         title = this.title,
         overview = this.overview,
         poster_path = this.posterPath,

@@ -32,6 +32,7 @@ import com.example.myfinalproject.MovieDetails.MovieDetailsScreen
 import com.example.myfinalproject.MovieDetails.MovieDetailsViewModel
 import com.example.myfinalproject.MovieDetails.MovieDetailsViewModelFactory
 import com.example.myfinalproject.Model.Network.ApiService
+import com.example.myfinalproject.Model.Repo.UserRepoImpl
 import com.example.myfinalproject.ProfileScreen
 import com.example.myfinalproject.SearchScreen.searchUi.SearchScreen
 import com.example.myfinalproject.SearchScreen.SearchViewModel
@@ -49,7 +50,6 @@ fun AppNavHost(navController: NavHostController) {
     val startDestination = "splash"
         //if (FirebaseAuth.getInstance().currentUser != null) "home" else "auth"
     val authVM: AuthViewModel = viewModel()
-
     // Create context and database
     val context = LocalContext.current
 
@@ -68,6 +68,8 @@ fun AppNavHost(navController: NavHostController) {
             context = context
         )
     }
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val userRepo = remember { UserRepoImpl(firebaseAuth) }
 
     // Create snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -160,7 +162,7 @@ fun AppNavHost(navController: NavHostController) {
 
                 if (movieId != null) {
                     val detailsVM: MovieDetailsViewModel = viewModel(
-                        factory = MovieDetailsViewModelFactory(repository)
+                        factory = MovieDetailsViewModelFactory(repository,userRepo)
                     )
 
                     MovieDetailsScreen(
@@ -179,7 +181,7 @@ fun AppNavHost(navController: NavHostController) {
             // fav screen
             composable("favorites") {
                 val favoritesVM: FavoritesViewModel = viewModel(
-                    factory = FavoritesViewModelFactory(repository)
+                    factory = FavoritesViewModelFactory(repository,userRepo)
                 )
 
                 FavoritesScreen(

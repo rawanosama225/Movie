@@ -3,6 +3,7 @@ package com.example.myfinalproject.Model.Data
 data class Movie(
 
     val id: Int,
+    val userId: String?,
     val title: String?,
     val overview: String?,
     val poster_path: String?,

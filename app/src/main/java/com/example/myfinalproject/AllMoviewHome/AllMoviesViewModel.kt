@@ -113,12 +113,12 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
         }
     }
 
+    //TODO: add user id to add to favorite
     fun toggleFavorite(movieId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             if (isFavorite) {
                 repository.removeFromFavorites(movieId)
             } else {
-
                 val currentState = _uiState.value
                 if (currentState is HomeUiState.Success) {
                     val movie = listOf(
@@ -126,8 +126,9 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
                         currentState.popular,
                         currentState.topRated,
                         currentState.upcoming
-                    ).flatten().find { it.id == movieId }
-
+                    ).flatten().find {
+                        it.id == movieId
+                    }
                     movie?.let { repository.addToFavorites(it) }
                 }
             }

@@ -101,15 +101,16 @@ class MovieRepository(
 
     // ============== FAVORITES ==============
 
-    suspend fun getFavoriteMovies(): List<Movie> {
+    suspend fun getFavoriteMovies(userId: String): List<Movie> {
         return try {
-            favoritesRepo.getAllFavorites().map { it.toMovie() }
+            favoritesRepo.getAllFavorites(userId).map { it.toMovie() }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
         }
     }
 
+    //ToDo: handle adding movie to database with userId
     suspend fun addToFavorites(movie: Movie) {
         try {
             favoritesRepo.addFavorite(movie.toFavoriteMovie())
