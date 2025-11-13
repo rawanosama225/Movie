@@ -9,6 +9,7 @@ import com.example.myfinalproject.Model.Data.MovieDetails
 import com.example.myfinalproject.Model.Repo.UserRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 class MovieDetailsViewModel(
     private val repository: MovieRepository,
@@ -20,15 +21,27 @@ class MovieDetailsViewModel(
 
     val isFavorite = MutableStateFlow(false)
 
+    private val _userId = MutableStateFlow("")
+    val userId = _userId.asStateFlow()
+
     init {
 
-        observeFavoriteChanges()
+       // observeFavoriteChanges()
+        getUserId()
+    }
+    private fun getUserId() {
+        viewModelScope.launch {
+            val uid = userRepo.getUserId()
+            _userId.value = uid
+            if (uid.isNotEmpty()) {
+                observeFavoriteChanges(uid) 
+            }
+        }
     }
 
-
-    private fun observeFavoriteChanges() {
+    private fun observeFavoriteChanges(userId:String) {
         viewModelScope.launch {
-            repository.favoriteIds.collect { ids ->
+            repository.getFavoriteIds(userId).collect { ids ->
                 val currentId = _movieState.value?.id
                 if (currentId != null) {
                     isFavorite.value = ids.contains(currentId)

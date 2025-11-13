@@ -28,8 +28,9 @@ class MovieRepository(
     private var cachedUpcoming: List<Movie>? = null
 
 
-    val favoriteIds: Flow<Set<Int>> = favoritesRepo.getFavoriteIdsFlow()
-        .map { it.toSet() }
+    fun getFavoriteIds(userId: String): Flow<Set<Int>> {
+        return favoritesRepo.getFavoriteIdsFlow(userId).map { it.toSet() }
+    }
 
 
     suspend fun getNowPlayingMovies(): List<Movie> {

@@ -17,8 +17,8 @@ class FavoritesRepository(private val dao: FavoriteMovieDao)
     }
 
 
-    fun getFavoriteIdsFlow(): Flow<List<Int>> {
-        return dao.getFavoriteIdsFlow()
+    fun getFavoriteIdsFlow(userId: String): Flow<List<Int>> {
+        return dao.getFavoriteIdsFlow(userId = userId)
     }
 
     suspend fun addFavorite(movie: FavoriteMovie) {

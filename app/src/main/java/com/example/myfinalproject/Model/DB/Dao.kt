@@ -19,8 +19,8 @@ interface FavoriteMovieDao {
     fun getAllFavoritesFlow(): Flow<List<FavoriteMovie>>
 
 
-    @Query("SELECT id FROM favorite_movies")
-    fun getFavoriteIdsFlow(): Flow<List<Int>>
+    @Query("SELECT id FROM favorite_movies WHERE userId = :userId")
+    fun getFavoriteIdsFlow(userId: String): Flow<List<Int>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorite(movie: FavoriteMovie)
 

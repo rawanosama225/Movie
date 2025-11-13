@@ -43,7 +43,7 @@ fun FavoritesScreen(
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "FavoritesScreen: $userId")
-        viewModel.loadFavorites()
+        viewModel.loadFavorites(userId)
     }
 
     Scaffold(

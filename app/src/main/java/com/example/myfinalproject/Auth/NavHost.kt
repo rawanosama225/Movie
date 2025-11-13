@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.myfinalproject.AllMoviewHome.HomeScreen
 import com.example.myfinalproject.AllMoviewHome.HomeViewModel
+import com.example.myfinalproject.AllMoviewHome.HomeViewModelFactory
 import com.example.myfinalproject.Model.Repo.MovieRepository
 import com.example.myfinalproject.FavScreen.FavoritesScreen
 import com.example.myfinalproject.FavScreen.FavoritesViewModel
@@ -128,12 +129,9 @@ fun AppNavHost(navController: NavHostController) {
 
             //  Home
             composable("home") {
-                val homeVM: HomeViewModel = viewModel(factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return HomeViewModel(repository) as T
-                    }
-                })
+                val homeVM: HomeViewModel = viewModel(
+                    factory = HomeViewModelFactory(repository, userRepo)
+                )
 
                 HomeScreen(
                     viewModel = homeVM,

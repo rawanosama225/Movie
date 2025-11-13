@@ -1,10 +1,12 @@
 package com.example.myfinalproject.AllMoviewHome
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myfinalproject.Model.Data.Movie
 import com.example.myfinalproject.Model.Repo.MovieRepository
+import com.example.myfinalproject.Model.Repo.UserRepo
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +25,13 @@ sealed class HomeUiState {
     data class Error(val message: String) : HomeUiState()
 }
 
-class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
+class HomeViewModel(
+    private val repository: MovieRepository,
+    private val userRepo: UserRepo
+    ) : ViewModel() {
 
+    private val _userId = MutableStateFlow("")
+    val userId = _userId.asStateFlow()
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -32,13 +39,25 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
     val isRefreshing = _isRefreshing.asStateFlow()
 
     init {
-        observeFavoriteChanges()
+
+        getUserId()
     }
 
+private fun getUserId() {
+    viewModelScope.launch {
+        val id = userRepo.getUserId()
+        _userId.value = id
 
-    private fun observeFavoriteChanges() {
+        if (id.isNotEmpty()) {
+            observeFavoriteChanges(id)
+        }
+    }
+}
+
+
+    private fun observeFavoriteChanges(userId: String) {
         viewModelScope.launch {
-            repository.favoriteIds.collect { favoriteIds ->
+            repository.getFavoriteIds(userId).collect { favoriteIds ->
                 val currentState = _uiState.value
                 if (currentState is HomeUiState.Success) {
                     _uiState.value = currentState.copy(
@@ -74,7 +93,7 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
                 val results = awaitAll(nowPlaying, popular, topRated, upcoming)
 
 
-                val favoriteIds = repository.favoriteIds.first()
+                val favoriteIds = repository.getFavoriteIds(userId.value).first()
 
                 _uiState.value = HomeUiState.Success(
                     nowPlaying = updateMoviesFavoriteState(results[0] as List<Movie>, favoriteIds),
@@ -113,9 +132,14 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
         }
     }
 
-    //TODO: add user id to add to favorite
     fun toggleFavorite(movieId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
+            val currentUserId = userId.value
+            if (currentUserId.isEmpty()) {
+                Log.e("HomeViewModel", "User ID is empty! Cannot toggle favorite.")
+                return@launch
+            }
+
             if (isFavorite) {
                 repository.removeFromFavorites(movieId)
             } else {
@@ -126,10 +150,13 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
                         currentState.popular,
                         currentState.topRated,
                         currentState.upcoming
-                    ).flatten().find {
-                        it.id == movieId
+                    ).flatten().find { it.id == movieId }
+
+                    movie?.let {
+
+                        val movieWithUserId = it.copy(userId = currentUserId)
+                        repository.addToFavorites(movieWithUserId)
                     }
-                    movie?.let { repository.addToFavorites(it) }
                 }
             }
         }
@@ -145,8 +172,8 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
         fetchMovies()
     }
 }
-class HomeViewModelFactory(private val repository: MovieRepository) : ViewModelProvider.Factory {
+class HomeViewModelFactory(private val repository: MovieRepository,private val userRepo: UserRepo) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HomeViewModel(repository) as T
+        return HomeViewModel(repository,userRepo) as T
     }
 }

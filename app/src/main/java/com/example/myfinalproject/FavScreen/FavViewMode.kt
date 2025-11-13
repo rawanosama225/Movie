@@ -29,24 +29,24 @@ class FavoritesViewModel(
 
     init {
         //  loadFavorites
-        observeFavorites()
+      //  observeFavorites()
         getUserId()
     }
 
 
-    private fun observeFavorites() {
+    private fun observeFavorites(userId: String) {
         viewModelScope.launch {
-            repository.favoriteIds.collect {
-                loadFavorites()
+            repository.getFavoriteIds(userId).collect {
+                loadFavorites(userId)
             }
         }
     }
 
-    fun loadFavorites() {
+    fun loadFavorites(userId: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _favoriteMovies.value = repository.getFavoriteMovies(userId.value)
+                _favoriteMovies.value = repository.getFavoriteMovies(userId)
             } catch (e: Exception) {
                 e.printStackTrace()
                 _favoriteMovies.value = emptyList()
@@ -65,7 +65,13 @@ class FavoritesViewModel(
 
     fun getUserId(){
         viewModelScope.launch {
-           _userId.value = userRepo.getUserId()
+          // _userId.value = userRepo.getUserId()
+            val uid =userRepo.getUserId()
+            _userId.value =uid
+            if (uid.isNotEmpty()) {
+
+                observeFavorites(uid)
+            }
         }
     }
 }
