@@ -122,26 +122,27 @@ private fun getUserId() {
         }
     }
 
-    fun toggleFavorite(movie: Movie) {
-        viewModelScope.launch {
-            if (movie.isFavorite) {
-                repository.removeFromFavorites(movie.id)
-            } else {
-                repository.addToFavorites(movie)
-            }
-        }
-    }
+//    fun toggleFavorite(movie: Movie) {
+//        viewModelScope.launch {
+//            if (movie.isFavorite) {
+//                repository.removeFromFavorites(movie.id)
+//            } else {
+//                repository.addToFavorites(movie)
+//            }
+//        }
+//    }
 
     fun toggleFavorite(movieId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             val currentUserId = userId.value
+            val userId = userRepo.getUserId()
             if (currentUserId.isEmpty()) {
                 Log.e("HomeViewModel", "User ID is empty! Cannot toggle favorite.")
                 return@launch
             }
 
             if (isFavorite) {
-                repository.removeFromFavorites(movieId)
+                repository.removeFromFavorites(movieId,userId)
             } else {
                 val currentState = _uiState.value
                 if (currentState is HomeUiState.Success) {
@@ -174,6 +175,6 @@ private fun getUserId() {
 }
 class HomeViewModelFactory(private val repository: MovieRepository,private val userRepo: UserRepo) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HomeViewModel(repository,userRepo) as T
+        return HomeViewModel(repository, userRepo) as T
     }
 }

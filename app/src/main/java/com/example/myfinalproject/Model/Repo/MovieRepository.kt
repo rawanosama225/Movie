@@ -7,8 +7,10 @@ import com.example.myfinalproject.Model.Data.Person
 import com.example.myfinalproject.Model.Data.toFavoriteMovie
 import com.example.myfinalproject.Model.Data.toMovie
 import com.example.myfinalproject.Model.Network.ApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 
 class MovieRepository(
@@ -33,8 +35,8 @@ class MovieRepository(
     }
 
 
-    suspend fun getNowPlayingMovies(): List<Movie> {
-        return try {
+    suspend fun getNowPlayingMovies(): List<Movie>  = withContext(Dispatchers.IO){
+         try {
             val all = mutableListOf<Movie>()
             for (page in 1..3) {
                 val response = api.getNowPlayingMovies(apiKey, page)
@@ -50,8 +52,8 @@ class MovieRepository(
     }
 
 
-    suspend fun getPopularMovies(): List<Movie> {
-        return try {
+    suspend fun getPopularMovies(): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             val movies = api.getPopularMovies(apiKey).results
 
             cachedPopular = movies.distinctBy { it.id }
@@ -63,8 +65,8 @@ class MovieRepository(
     }
 
 
-    suspend fun getTopRatedMovies(): List<Movie> {
-        return try {
+    suspend fun getTopRatedMovies(): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             val movies = api.getTopRatedMovies(apiKey).results
 
             cachedTopRated = movies.distinctBy { it.id }
@@ -76,8 +78,8 @@ class MovieRepository(
     }
 
 
-    suspend fun getUpcomingMovies(): List<Movie> {
-        return try {
+    suspend fun getUpcomingMovies(): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             val movies = api.getUpcomingMovies(apiKey).results
 
             cachedUpcoming = movies.distinctBy { it.id }
@@ -88,8 +90,8 @@ class MovieRepository(
         }
     }
 
-    suspend fun fetchMovieDetails(movieId: Int): MovieDetails {
-        return api.getMovieDetails(movieId, apiKey)
+    suspend fun fetchMovieDetails(movieId: Int): MovieDetails = withContext(Dispatchers.IO) {
+         api.getMovieDetails(movieId, apiKey)
     }
 
     fun cacheMovieDetails(movie: MovieDetails) {
@@ -102,8 +104,8 @@ class MovieRepository(
 
     // ============== FAVORITES ==============
 
-    suspend fun getFavoriteMovies(userId: String): List<Movie> {
-        return try {
+    suspend fun getFavoriteMovies(userId: String): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             favoritesRepo.getAllFavorites(userId).map { it.toMovie() }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -112,7 +114,7 @@ class MovieRepository(
     }
 
     //ToDo: handle adding movie to database with userId
-    suspend fun addToFavorites(movie: Movie) {
+    suspend fun addToFavorites(movie: Movie) = withContext(Dispatchers.IO) {
         try {
             favoritesRepo.addFavorite(movie.toFavoriteMovie())
         } catch (e: Exception) {
@@ -120,25 +122,25 @@ class MovieRepository(
         }
     }
 
-    suspend fun removeFromFavorites(movieId: Int) {
+    suspend fun removeFromFavorites(movieId: Int,userId: String) = withContext(Dispatchers.IO) {
         try {
-            favoritesRepo.removeFavorite(movieId)
+            favoritesRepo.removeFavorite(movieId,userId)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    suspend fun isFavorite(movieId: Int): Boolean {
-        return try {
-            favoritesRepo.isFavorite(movieId)
+    suspend fun isFavorite(movieId: Int,userId: String): Boolean = withContext(Dispatchers.IO) {
+         try {
+            favoritesRepo.isFavorite(movieId,userId)
         } catch (e: Exception) {
             e.printStackTrace()
             false
         }
     }
 
-    suspend fun searchMovies(query: String): List<Movie> {
-        return try {
+    suspend fun searchMovies(query: String): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             val movies = api.searchMovies(apiKey, query).results
 
             movies.distinctBy { it.id }
@@ -148,8 +150,8 @@ class MovieRepository(
         }
     }
 
-    suspend fun searchPeople(query: String): List<Person> {
-        return try {
+    suspend fun searchPeople(query: String): List<Person> = withContext(Dispatchers.IO){
+       try {
             api.searchPeople(apiKey, query).results
         } catch (e: Exception) {
             e.printStackTrace()
@@ -157,8 +159,8 @@ class MovieRepository(
         }
     }
 
-    suspend fun getGenres(): List<Genre> {
-        return try {
+    suspend fun getGenres(): List<Genre> = withContext(Dispatchers.IO) {
+         try {
             api.getGenres(apiKey).genres
         } catch (e: Exception) {
             e.printStackTrace()
@@ -166,8 +168,8 @@ class MovieRepository(
         }
     }
 
-    suspend fun getMoviesByGenre(genreId: Int): List<Movie> {
-        return try {
+    suspend fun getMoviesByGenre(genreId: Int): List<Movie> = withContext(Dispatchers.IO) {
+         try {
             val movies = api.getMoviesByGenre(apiKey, genreId).results
 
             movies.distinctBy { it.id }

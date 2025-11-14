@@ -25,11 +25,11 @@ class FavoritesRepository(private val dao: FavoriteMovieDao)
         dao.insertFavorite(movie)
     }
 
-    suspend fun removeFavorite(movieId: Int) {
-        dao.deleteFavorite(movieId)
+    suspend fun removeFavorite(movieId: Int, userId: String) {
+        dao.deleteFavorite(movieId,userId)
     }
 
-    suspend fun isFavorite(movieId: Int): Boolean {
-        return dao.isFavorite(movieId)
+    suspend fun isFavorite(movieId: Int, userId: String): Boolean {
+        return dao.isFavorite(movieId,userId)
     }
 }

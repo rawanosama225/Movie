@@ -58,7 +58,8 @@ class FavoritesViewModel(
 
     fun removeFavorite(movieId: Int) {
         viewModelScope.launch {
-            repository.removeFromFavorites(movieId)
+            val userId = userRepo.getUserId()
+            repository.removeFromFavorites(movieId,userId)
            // loadFavorites() // Reload the list
         }
     }

@@ -25,9 +25,9 @@ interface FavoriteMovieDao {
     suspend fun insertFavorite(movie: FavoriteMovie)
 
     //TODO: Delete movie where movieId and userId
-    @Query("DELETE FROM favorite_movies WHERE id = :movieId")
-    suspend fun deleteFavorite(movieId: Int)
+    @Query("DELETE FROM favorite_movies WHERE id = :movieId  AND userId = :userId")
+    suspend fun deleteFavorite(movieId: Int,userId: String)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_movies WHERE id = :movieId)")
-    suspend fun isFavorite(movieId: Int): Boolean
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_movies WHERE id = :movieId AND userId = :userId)")
+    suspend fun isFavorite(movieId: Int,userId: String): Boolean
 }

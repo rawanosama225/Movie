@@ -34,7 +34,7 @@ class MovieDetailsViewModel(
             val uid = userRepo.getUserId()
             _userId.value = uid
             if (uid.isNotEmpty()) {
-                observeFavoriteChanges(uid) 
+                observeFavoriteChanges(uid)
             }
         }
     }
@@ -55,7 +55,8 @@ class MovieDetailsViewModel(
             try {
                 val movie = repository.fetchMovieDetails(movieId)
                 _movieState.value = movie
-                isFavorite.value = repository.isFavorite(movieId)
+                val uid = userRepo.getUserId()
+                isFavorite.value = repository.isFavorite(movieId,uid)
                 repository.cacheMovieDetails(movie)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -70,7 +71,7 @@ class MovieDetailsViewModel(
             val userId = userRepo.getUserId()
 
             if (isFavorite.value) {
-                repository.removeFromFavorites(movieDetails.id)
+                repository.removeFromFavorites(movieDetails.id,userId)
                 isFavorite.value = false
             } else {
                 val movie = Movie(
