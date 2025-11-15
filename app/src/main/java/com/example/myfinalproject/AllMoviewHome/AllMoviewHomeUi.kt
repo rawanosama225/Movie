@@ -1,5 +1,6 @@
 package com.example.myfinalproject.AllMoviewHome
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,6 +33,7 @@ import com.example.myfinalproject.Model.Data.Movie
 import com.example.myfinalproject.Auth.netflixFont
 import kotlinx.coroutines.delay
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.myfinalproject.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,6 +115,8 @@ fun HomeContent(
     onMovieClick: (Int) -> Unit,
     onToggleFavorite: (Int, Boolean) -> Unit
 ) {
+    val allMovieLists = listOf(nowPlaying,popular,topRated)
+    val randomMovies = allMovieLists.random().shuffled().take(5)
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -149,7 +153,7 @@ fun HomeContent(
         item {
             if (nowPlaying.isNotEmpty()) {
                 HighlightSlider(
-                    movies = nowPlaying.take(5),
+                    movies = randomMovies,
                     onMovieClick = onMovieClick
                 )
             }
@@ -336,8 +340,8 @@ fun HighlightSlider(
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit
 ) {
-    var currentIndex by remember { mutableStateOf(0) }
-
+    var currentIndex by rememberSaveable { mutableStateOf(0) }
+    Log.d("HighlightSlider", "current highlighter $currentIndex")
     LaunchedEffect(movies) {
         while (true) {
             delay(3000)

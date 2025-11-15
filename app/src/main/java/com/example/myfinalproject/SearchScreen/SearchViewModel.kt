@@ -99,6 +99,7 @@ class SearchViewModel(
             _uiState.value = SearchUiState.Loading
             try {
                 val movies = repository.getMoviesByGenre(genreId)
+                _selectedCategory.value = SearchCategory.MOVIES
                 _uiState.value = SearchUiState.Success(
                     SearchResult(movies = movies)
                 )

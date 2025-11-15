@@ -1,5 +1,6 @@
 package com.example.myfinalproject.SearchScreen.searchUi
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -22,6 +23,8 @@ fun SearchScreen(
     onNavigate: (String) -> Unit,
     currentRoute: String
 ) {
+
+    val TAG = "SearchScreen"
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -82,12 +85,15 @@ fun SearchScreen(
                 when (val state = uiState) {
                     is SearchUiState.Initial -> EmptySearchState()
                     is SearchUiState.Loading -> LoadingState()
-                    is SearchUiState.Success -> SearchResultsContent(
-                        searchResult = state.searchResult,
-                        selectedCategory = selectedCategory,
-                        onMovieClick = onMovieClick,
-                        onGenreClick = viewModel::onGenreClick
-                    )
+                    is SearchUiState.Success -> {
+                        Log.d(TAG, "genre: ${state.searchResult.genres}")
+                        SearchResultsContent(
+                            searchResult = state.searchResult,
+                            selectedCategory = selectedCategory,
+                            onMovieClick = onMovieClick,
+                            onGenreClick = viewModel::onGenreClick
+                        )
+                    }
                     is SearchUiState.Error -> ErrorState(message = state.message)
                 }
             }
